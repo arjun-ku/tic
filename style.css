@@ -2,8 +2,10 @@
 :root {
     --bg-color: #0f172a;
     --primary-color: #64748b;
-    --accent-x: #38bdf8; /* Cyan for X */
-    --accent-o: #f472b6; /* Pink for O */
+    --accent-x: #38bdf8;
+    /* Cyan for X */
+    --accent-o: #f472b6;
+    /* Pink for O */
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-primary: #e2e8f0;
@@ -75,49 +77,83 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-20px) scale(1.1); }
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-20px) scale(1.1);
+    }
 }
 
-/* Game Container */
+/* Game Wrapper */
+.game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 1;
+}
+
 .game-container {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    padding: 2rem;
+    padding: 3rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    max-width: 400px;
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    align-items: center;
+    max-width: 900px;
     width: 90%;
 }
 
-.game-title {
-    font-family: var(--font-heading);
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+/* Board Area */
+.board-container {
+    position: relative;
 }
 
-.highlight {
-    color: var(--accent-x);
-    text-shadow: 0 0 15px var(--accent-x);
-}
-
-.status {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
-}
-
-/* Board */
 .board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.line-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.winning-line {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.winning-line line {
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: drawLine 0.8s ease-out forwards;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+@keyframes drawLine {
+    to {
+        stroke-dashoffset: 0;
+    }
 }
 
 .cell {
@@ -133,8 +169,6 @@ body {
     font-family: var(--font-heading);
     cursor: pointer;
     transition: all 0.3s ease;
-    width: 100%; /* Responsive sizing */
-    aspect-ratio: 1; /* Keep square */
 }
 
 .cell:hover {
@@ -153,6 +187,52 @@ body {
     text-shadow: 0 0 15px var(--accent-o);
 }
 
+/* Info Panel (Right Side) */
+.info-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 250px;
+}
+
+.game-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    line-height: 1.2;
+}
+
+.highlight {
+    color: var(--accent-x);
+    text-shadow: 0 0 15px var(--accent-x);
+}
+
+.status-container {
+    margin-bottom: 2rem;
+    min-height: 80px;
+}
+
+.status {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--accent-x);
+    transition: color 0.3s ease;
+}
+
+.winner-message {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    opacity: 0.8;
+    height: 1.5em;
+    /* Reserve space */
+}
+
 /* Buttons */
 .btn-restart {
     background: linear-gradient(135deg, var(--accent-x), #3b82f6);
@@ -166,6 +246,7 @@ body {
     transition: transform 0.2s, box-shadow 0.2s;
     text-transform: uppercase;
     letter-spacing: 1px;
+    align-self: flex-start;
 }
 
 .btn-restart:hover {
@@ -177,57 +258,37 @@ body {
     transform: translateY(0);
 }
 
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.modal.show {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.modal-content {
-    background: var(--bg-color);
-    padding: 3rem;
-    border-radius: 20px;
-    border: 1px solid var(--glass-border);
-    text-align: center;
-    box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
-    transform: scale(0.8);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.modal.show .modal-content {
-    transform: scale(1);
-}
-
-#winnerText {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    font-family: var(--font-heading);
-}
 
 /* Responsive */
+@media (max-width: 900px) {
+    .game-container {
+        flex-direction: column-reverse;
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .info-panel {
+        align-items: center;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .btn-restart {
+        align-self: center;
+    }
+}
+
 @media (max-width: 480px) {
     .board {
         gap: 5px;
     }
+
     .cell {
+        width: 80px;
+        height: 80px;
         font-size: 2rem;
     }
+
     .game-title {
         font-size: 2rem;
     }
